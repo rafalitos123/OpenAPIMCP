@@ -7,3 +7,7 @@ services:
     startCommand: python mcp-server/src/main.py
     autoDeploy: true
     healthCheckPath: /health
+    envVars:
+      - name: FASTMCP_EXPERIMENTAL_ENABLE_NEW_OPENAPI_PARSER
+        value: true
+        
