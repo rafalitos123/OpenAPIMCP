@@ -41,7 +41,7 @@ body {
   max-width: 100%;
   margin: 0 auto;
   min-height: 100svh;
-  padding: 24px 20px;
+  padding: 24px 16px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -61,7 +61,7 @@ body {
   box-shadow: var(--shadow);
   padding: 22px;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
