@@ -99,11 +99,13 @@ def _build_mcp_from_openapi(openapi_spec: dict, openapi_url: str) -> FastMCP:
         component.tags.add("openapi")
 
         secured_schemes = get_security_schemes_for_route(route)
+        logger.debug(f"Secured schemes for route {route.path} {route.method}: {secured_schemes}")
         if not secured_schemes:
             return
 
         # Only Tools support arbitrary header parameters at call time
         if isinstance(component, OpenAPITool):
+            logger.debug(f"Customizing components for route {route.path} {route.method}")
             params = component.parameters or {"type": "object", "properties": {}}
             props = params.setdefault("properties", {})
 
