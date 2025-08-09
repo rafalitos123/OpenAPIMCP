@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OpenAPI → MCP Generator</title>
+    <meta name="description" content="Minimal UI to generate an MCP server URL from an OpenAPI specification (mocked)." />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="header">
+        <h1>OpenAPI → MCP</h1>
+        <p class="subtitle">Generate a minimal MCP server from an OpenAPI URL</p>
+      </header>
+
+      <section class="card">
+        <form id="generator-form" class="form" novalidate>
+          <label class="label" for="apiUrl">OpenAPI URL</label>
+          <div class="input-row">
+            <input
+              id="apiUrl"
+              name="apiUrl"
+              type="url"
+              inputmode="url"
+              placeholder="https://example.com/openapi.json"
+              autocomplete="url"
+              required
+              aria-describedby="urlHint"
+            />
+            <button id="generateBtn" class="btn primary" type="submit">Generate</button>
+          </div>
+          <p id="urlHint" class="hint">Enter a public OpenAPI/Swagger JSON or YAML URL.</p>
+        </form>
+
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+
+        <div id="result" class="result hidden">
+          <div class="result-row">
+            <span class="result-label">MCP Server URL</span>
+            <a id="mcpUrl" class="result-link" href="#" target="_blank" rel="noopener"></a>
+            <button id="copyBtn" class="icon-btn" title="Copy URL" aria-label="Copy URL">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                <path d="M16 1H4c-1.1 0-2 .9-2 2v12h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span class="muted">Prototype · Mocked generation (real API wiring later)</span>
+      </footer>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+.venv
+.vscode
+__pycache__
+openapi.json
+prompts.json
+resources.json
+resource_templates.json
+tools.json
