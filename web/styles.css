@@ -38,14 +38,21 @@ body {
 }
 
 .container {
-  max-width: 780px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 48px 20px 32px;
+  min-height: 100svh;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 28px;
 }
 
-.header { text-align: center; margin-bottom: 18px; }
-.header h1 { margin: 0; font-size: 28px; letter-spacing: -0.02em; }
+.header { text-align: center; margin-bottom: 24px; }
+.header h1 { margin: 0; font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.02em; font-weight: 700; }
 .subtitle { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+/* Tagline placed below the card */
+.tagline { margin: 48px 0 0; color: var(--muted); font-size: 1.2rem; text-align: center; }
 
 .card {
   background: var(--card);
@@ -53,12 +60,15 @@ body {
   border-radius: 14px;
   box-shadow: var(--shadow);
   padding: 22px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .form { display: grid; gap: 10px; }
 .label { font-size: 12px; color: var(--muted); }
 
-.input-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; }
+.input-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
 @media (max-width: 540px) { .input-row { grid-template-columns: 1fr; } }
 
 input[type="url"] {
