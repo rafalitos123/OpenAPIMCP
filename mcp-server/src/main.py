@@ -40,17 +40,25 @@ RUNNING_SERVERS: dict[str, dict] = {}
 
 
 def _derive_base_url(openapi_spec: dict, openapi_url: str) -> str:
-    """Derive API base URL from OpenAPI servers or fallback to the origin of the spec URL."""
-    try:
-        servers = openapi_spec.get("servers") or []
-        if servers and isinstance(servers, list):
-            url = servers[0].get("url") if isinstance(servers[0], dict) else None
-            if isinstance(url, str) and url:
-                return url
-    except Exception:
-        pass
+    """Derive API base URL solely from the given OpenAPI URL.
+
+    Removes a trailing 'openapi.json' path segment if present and returns the
+    full base URL (scheme + host + remaining path). Ignores 'servers' in the spec.
+    """
     parsed = urlparse(openapi_url)
-    return f"{parsed.scheme}://{parsed.netloc}"
+    path = parsed.path or ""
+    # Normalize trailing slash
+    if path.endswith("/"):
+        path = path[:-1]
+
+    # Remove a final 'openapi.json' segment if present (case-insensitive)
+    segments = [seg for seg in path.split("/") if seg]
+    if segments and segments[-1].lower() == "openapi.json":
+        segments = segments[:-1]
+
+    new_path = ("/" + "/".join(segments)) if segments else ""
+    base = f"{parsed.scheme}://{parsed.netloc}{new_path}"
+    return base
 
 
 def _build_mcp_from_openapi(openapi_spec: dict, openapi_url: str) -> FastMCP:
