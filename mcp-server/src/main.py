@@ -11,6 +11,7 @@ from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastmcp.utilities.logging import configure_logging, get_logger
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import RedirectResponse
 from pathlib import Path
 import os
 try:
@@ -172,7 +173,15 @@ async def generate(request: Request, openapi_url: str = Query(..., description="
     mount_path = f"/mcp/{server_id}"
     mcp_app = mcp.http_app(path="/")
     app.mount(mount_path, mcp_app)
-    RUNNING_SERVERS[server_id] = {"mount_path": mount_path, "mcp": mcp}
+    # Explicitly start the sub-app lifespan since it's mounted after startup
+    lifespan_cm = None
+    try:
+        # Starlette expects calling lifespan with the app instance to get the context manager
+        lifespan_cm = mcp_app.lifespan(mcp_app)  # type: ignore[attr-defined]
+        await lifespan_cm.__aenter__()
+    except Exception:
+        logger.exception("Failed to start MCP app lifespan; requests may fail")
+    RUNNING_SERVERS[server_id] = {"mount_path": mount_path, "mcp": mcp, "lifespan_ctx": lifespan_cm}
 
     base = str(request.base_url).rstrip("/")
     mcp_url = f"{base}{mount_path}/"
@@ -184,12 +193,26 @@ async def generate(request: Request, openapi_url: str = Query(..., description="
 async def health() -> dict:
     return {"status": "ok"}
 
-# Mount static UI last, so API routes (like /generate) take precedence
+@app.on_event("shutdown")
+async def _shutdown_mounted_mcp_apps() -> None:
+    for sid, data in list(RUNNING_SERVERS.items()):
+        ctx = data.get("lifespan_ctx")
+        if ctx is not None:
+            try:
+                await ctx.__aexit__(None, None, None)
+            except Exception:
+                logger.exception(f"Error shutting down lifespan for {sid}")
+
+# Serve UI at /ui and redirect / -> /ui/ to avoid intercepting /mcp/*
+@app.get("/", include_in_schema=False)
+async def root_redirect():
+    return RedirectResponse(url="/ui/")
+
 try:
     project_root = Path(__file__).resolve().parents[2]
     static_dir = project_root / "web"
     if static_dir.exists():
-        app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="static")
+        app.mount("/ui", StaticFiles(directory=str(static_dir), html=True), name="static")
 except Exception:
     # Non-fatal if static mount fails
     pass
